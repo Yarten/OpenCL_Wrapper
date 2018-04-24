@@ -21,22 +21,16 @@ namespace opencl
     {
     public:
         /// 构造器
-        Buffer(size_t size = -1, cl_mem_flags flag = 0)
+        explicit Buffer(size_t size = -1, cl_mem_flags flag = 0, T defaultValue = T())
                 : size(size), flag(flag)
         {
             if(size == -1)
-                data.reset(new T());
-            else
             {
-                data.reset(new T[size]);
-                for(int i = 0; i < size; i++)
-                    data.get()[i] = T();
+                data.reset(new T(defaultValue));
+                this->flag = 0;
             }
-        }
-
-        Buffer(T value, cl_mem_flags flag = 0)
-        {
-            Set(value, flag);
+            else
+                Set(size, flag, defaultValue);
         }
 
         Buffer(shared_ptr<T> data, size_t size, cl_mem_flags flag = 0)
@@ -50,11 +44,14 @@ namespace opencl
         }
 
         /// 赋值接口
-        void Set(T value, cl_mem_flags flag = 0)
+        void Set(size_t size, cl_mem_flags flag = -1, T defaultValue = T())
         {
-            size = -1;
-            this->flag = flag;
-            data.reset(new T(value));
+            this->size = size;
+            if(flag != -1)
+                this->flag = flag;
+            data.reset(new T[size]);
+            for(int i = 0; i < size; i++)
+                data.get()[i] = defaultValue;
         }
 
         void Set(shared_ptr<T> data, size_t size, cl_mem_flags flag = 0)
@@ -85,7 +82,15 @@ namespace opencl
         /// 值操作接口
         Buffer & operator=(T value)
         {
-            *data = value;
+            if(size != -1)
+            {
+                size = -1;
+                this->flag = 0;
+                data.reset(new T(value));
+            }
+            else
+                *data = value;
+
             return *this;
         }
 
