@@ -16,7 +16,12 @@ include_directories(
         include
 )
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME}Example
         src/OpenCL.cpp include/OpenCL.h src/main.cpp include/Buffer.h include/Event.h src/Event.cpp)
+
+target_link_libraries(${PROJECT_NAME}Example ${boost_LIBS} ${cuda9_LIBS})
+
+add_library(${PROJECT_NAME} STATIC
+        src/OpenCL.cpp include/OpenCL.h include/Buffer.h include/Event.h src/Event.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${boost_LIBS} ${cuda9_LIBS})
