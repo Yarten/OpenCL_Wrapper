@@ -31,25 +31,16 @@ namespace opencl
 
                 Kernel() = default;
 
-                void SetSize(size_t local);
-
-                void SetSize(size_t global, size_t local);
-
-                void SetSize(size_t ndRange, size_t global, size_t local);
+                void SetSize(cl::NDRange global, cl::NDRange local = cl::NullRange);
 
                 template <typename ...Args>
                 Event operator()(Buffer<Args> & ... params)
                 {
-                    cl::Event event;
-                    cl_int status;
                     buffers.clear();
                     SetArg(0, params...);
-                    status = GetCommandQueue(platformIndex, deviceIndex).enqueueNDRangeKernel(*this, cl::NullRange, cl::NDRange(global, local), cl::NullRange, nullptr, &event);
-                    PrintError(status, "Enqueue NDRange Kernel");
-                    status = GetCommandQueue(platformIndex, deviceIndex).finish();
-                    PrintError(status, "Running Kernel");
+                    Event event = operator()();
                     CopyBack(0, params...);
-                    return Event(event);
+                    return event;
                 };
 
                 Event operator()();
@@ -129,7 +120,8 @@ namespace opencl
 
                 vector<cl_mem_flags> flags;
                 int platformIndex, deviceIndex;
-                size_t ndRange, global, local;
+//                size_t ndRange, global, local;
+                cl::NDRange global, local;
                 list<cl::Buffer> buffers;
             };
 

@@ -243,19 +243,8 @@ OpenCL::Program::Kernel::Kernel(Program & program, int platformIndex, int device
     //endregion
 }
 
-void OpenCL::Program::Kernel::SetSize(std::size_t local)
+void OpenCL::Program::Kernel::SetSize(cl::NDRange global, cl::NDRange local)
 {
-    SetSize(0, 0, local);
-}
-
-void OpenCL::Program::Kernel::SetSize(std::size_t global, std::size_t local)
-{
-    SetSize(0, global, local);
-}
-
-void OpenCL::Program::Kernel::SetSize(std::size_t ndRange, std::size_t global, std::size_t local)
-{
-    this->ndRange = ndRange;
     this->global = global;
     this->local = local;
 }
@@ -263,7 +252,10 @@ void OpenCL::Program::Kernel::SetSize(std::size_t ndRange, std::size_t global, s
 opencl::Event OpenCL::Program::Kernel::operator()()
 {
     cl::Event event;
-    GetCommandQueue(platformIndex, deviceIndex).enqueueNDRangeKernel(*this, ndRange, global, local, nullptr, &event);
-    GetCommandQueue(platformIndex, deviceIndex).finish();
+    cl_int status;
+    status = GetCommandQueue(platformIndex, deviceIndex).enqueueNDRangeKernel(*this, cl::NullRange, global, local, nullptr, &event);
+    PrintError(status, "Enqueue NDRange Kernel");
+    status = GetCommandQueue(platformIndex, deviceIndex).finish();
+    PrintError(status, "Running Kernel");
     return Event(event);
 }

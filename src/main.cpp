@@ -19,7 +19,7 @@ int main()
     OpenCL::Program::Kernel kernel = openCL("./Vadd.cl")("vadd");
 
     size_t rows = 200, cols = 300;
-    kernel.SetSize(rows, cols);
+    kernel.SetSize({rows, cols});
     Buffer<float> a(rows * cols), b(rows * cols), c(rows * cols);
 
     for(size_t i = 0; i < rows; i++)
