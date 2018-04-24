@@ -120,7 +120,6 @@ namespace opencl
 
                 vector<cl_mem_flags> flags;
                 int platformIndex, deviceIndex;
-//                size_t ndRange, global, local;
                 cl::NDRange global, local;
                 list<cl::Buffer> buffers;
             };

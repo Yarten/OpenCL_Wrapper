@@ -22,7 +22,7 @@ namespace opencl
     public:
         /// 构造器
         explicit Buffer(size_t size = -1, cl_mem_flags flag = 0, T defaultValue = T())
-                : size(size), flag(flag)
+                : size(size), flag(flag), weakData(nullptr)
         {
             if(size == -1)
             {
@@ -38,9 +38,9 @@ namespace opencl
             Set(data, size, flag);
         }
 
-        Buffer(const T * data, size_t size, cl_mem_flags flag = 0)
+        Buffer(T * data, size_t size, bool weak = false, cl_mem_flags flag = 0)
         {
-            Set(data, size, flag);
+            Set(data, size, weak, flag);
         }
 
         /// 赋值接口
@@ -52,6 +52,7 @@ namespace opencl
             data.reset(new T[size]);
             for(int i = 0; i < size; i++)
                 data.get()[i] = defaultValue;
+            weakData = nullptr;
         }
 
         void Set(shared_ptr<T> data, size_t size, cl_mem_flags flag = 0)
@@ -59,19 +60,29 @@ namespace opencl
             this->size = size;
             this->flag = flag;
             this->data = data;
+            this->weakData = nullptr;
         }
 
-        void Set(const T * data, size_t size, cl_mem_flags flag = 0)
+        void Set(T * data, size_t size, bool weak = false, cl_mem_flags flag = 0)
         {
             this->size = size;
             this->flag = flag;
-            this->data.reset(new T[size]);
-            for(int i = 0; i < size; i++)
-                this->data.get()[i] = data[i];
+            if(weak)
+            {
+                weakData = data;
+                this->data.reset();
+            }
+            else
+            {
+                weakData = nullptr;
+                this->data.reset(new T[size]);
+                for(int i = 0; i < size; i++)
+                    this->data.get()[i] = data[i];
+            }
         }
 
         /// 信息获取接口
-        T * Data() { return data.get(); }
+        T * Data() { return weakData ? weakData : data.get(); }
 
         size_t Size() { return size * sizeof(T); }
 
@@ -86,6 +97,7 @@ namespace opencl
             {
                 size = -1;
                 this->flag = 0;
+                this->weakData = nullptr;
                 data.reset(new T(value));
             }
             else
@@ -94,21 +106,21 @@ namespace opencl
             return *this;
         }
 
-        operator T() const { return *data; }
+        operator T() const { return weakData ? *weakData : *data; }
 
-        operator T&() { return *data; }
+        operator T&() { return weakData ? *weakData : *data; }
 
         /// 数组操作接口
         T & operator[](size_t index)
         {
             Check(index, true);
-            return data.get()[index];
+            return weakData ? weakData[index] : data.get()[index];
         }
 
         const T & operator[](size_t index) const
         {
             Check(index, true);
-            return data.get()[index];
+            return weakData ? weakData[index] : data.get()[index];
         }
 
         bool Check(size_t index, bool justThrow = false) const
@@ -129,5 +141,6 @@ namespace opencl
         cl_mem_flags flag;
         size_t size;
         shared_ptr<T> data;
+        T * weakData;
     };
 }

@@ -22,16 +22,21 @@ int main()
     kernel.SetSize({rows, cols});
     Buffer<float> a(rows * cols), b(rows * cols), c(rows * cols);
 
+    float d[200 * 300];
+    Buffer<float> e(d, 200 * 300, true);
+
     for(size_t i = 0; i < rows; i++)
         for(size_t j = 0; j < cols; j++)
         {
             a[i * cols + j] = 1;
             b[i * cols + j] = 2;
+            d[i * cols + j] = 3;
         }
 
-    Event event = kernel(c, a, b);
+    Event event = kernel(c, a, e);
 
     cout << endl << event.ExecutionTime << endl;
+    cout << c[0] << endl;
 
     return 0;
 }
