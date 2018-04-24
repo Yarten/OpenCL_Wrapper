@@ -1,0 +1,3 @@
+/media/yarten/YARTEN/File/SMIE/OpenCL/OpenCL-Wrapper/temp/CMakeFiles/rebuild_cache.dir
+/media/yarten/YARTEN/File/SMIE/OpenCL/OpenCL-Wrapper/temp/CMakeFiles/edit_cache.dir
+/media/yarten/YARTEN/File/SMIE/OpenCL/OpenCL-Wrapper/temp/CMakeFiles/OpenCL.dir
