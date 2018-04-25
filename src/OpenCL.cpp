@@ -58,6 +58,8 @@ int OpenCL::CreateOpenCLEnvironment()
             queues[i].emplace_back(contexts[i][j], devices[i][j], CL_QUEUE_PROFILING_ENABLE);
         }
     }
+
+    return status;
 }
 
 
