@@ -11,12 +11,13 @@
 using namespace std;
 using namespace opencl;
 
+
 int main()
 {
     cout << OpenCL::GetDevicesInformation() << endl;
 
     OpenCL openCL;
-    OpenCL::Program::Kernel kernel = openCL("./Vadd.cl")("vadd");
+    auto kernel = openCL("./Vadd.cl")("vadd");
 
     size_t rows = 200, cols = 300;
     kernel.SetSize({rows, cols});
@@ -37,6 +38,18 @@ int main()
 
     cout << endl << event.ExecutionTime << endl;
     cout << c[0] << endl;
+
+    Buffer<int> g({10, 20, 20});
+    g({0, 0, 3}) = 30;
+
+    cout << g({0, 0, 3}) << endl;
+    cout << g.Length() << endl;
+    
+    Buffer<float> v({3, 3}, {1, 2, 3,
+    4, 5, 6,
+    7, 8, 9});
+    
+    cout << v({2, 1}) << endl;
 
     return 0;
 }
