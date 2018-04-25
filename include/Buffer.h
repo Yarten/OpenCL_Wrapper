@@ -101,17 +101,23 @@ namespace opencl
             this->weakData = nullptr;
         }
 
-        void Set(T * data, size_t size, bool weak = false, cl_mem_flags flag = -1)
+        void Set(T * data, size_t size, bool weak = false, cl_mem_flags flag = -1, bool useWeakIfExist = false)
         {
-            Set(data, {size}, weak, flag);
+            Set(data, {size}, weak, flag, useWeakIfExist);
         }
 
-        void Set(T * data, initializer_list<size_t> dims, bool weak = false, cl_mem_flags flag  = -1)
+        void Set(T * data, initializer_list<size_t> dims, bool weak = false, cl_mem_flags flag  = -1, bool useWeakIfExist = false)
         {
             Resize(dims);
             if(flag != -1)
                 this->flag = flag;
-            if(weak)
+            if(data == weakData) return;
+            if(useWeakIfExist && weakData)
+            {
+                for(int i = 0; i < size; i++)
+                    weakData[i] = data[i];
+            }
+            else if(weak)
             {
                 weakData = data;
                 this->data.reset();

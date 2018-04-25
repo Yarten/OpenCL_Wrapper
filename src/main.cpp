@@ -34,7 +34,9 @@ int main()
             d[i * cols + j] = 3;
         }
 
-    Event event = kernel(c, a, e);
+    Buffer<int> h;
+    h = 3;
+    Event event = kernel(h, c, a, e);
 
     cout << endl << event.ExecutionTime << endl;
     cout << c[0] << endl;
@@ -44,11 +46,11 @@ int main()
 
     cout << g({0, 0, 3}) << endl;
     cout << g.Length() << endl;
-    
+
     Buffer<float> v({3, 3}, {1, 2, 3,
     4, 5, 6,
     7, 8, 9});
-    
+
     cout << v({2, 1}) << endl;
 
     return 0;

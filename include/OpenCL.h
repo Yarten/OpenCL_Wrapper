@@ -51,13 +51,13 @@ namespace opencl
                 void SetArg(cl_uint i, Buffer<T> & buffer)
                 {
                     if(i >= flags.size())
-                        throw "OpenCL Function Call's Parameters doesn't Match Declaration.";
+                        throw runtime_error("OpenCL Function Call's Parameters doesn't Match Declaration.");
 
                     cl_mem_flags flag = (buffer.Flag() == 0 ? flags[i] : buffer.Flag());
                     cl_int status;
                     if(flag == 0)
                     {
-                        status = Kernel::setArg(i, buffer);
+                        status = Kernel::setArg(i, (T)buffer);
                     }
                     else
                     {
@@ -87,14 +87,14 @@ namespace opencl
                                 CL_MAP_READ,
                                 0,
                                 buffer.Size());
-                        buffers.pop_front();
 
                         if((flag & CL_MEM_USE_HOST_PTR) == 0)
                         {
-                            buffer.Set(ptr, buffer.Size());
+                            buffer.Set(ptr, buffer.Size(), false, -1, true);
                         }
                     }
 
+                    if(flag != 0) buffers.pop_front();
                 }
 
                 template <typename T, typename ... Args>
